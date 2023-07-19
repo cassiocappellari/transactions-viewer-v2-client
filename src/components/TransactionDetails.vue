@@ -39,43 +39,35 @@
 </template>
 
 <script>
-import gql from "graphql-tag";
+import { GET_TRANSACTION_BY_ID } from "../graphql/queries";
 
 export default {
-	name: "TransactionDetails",
-	methods: {
-		getTransactionById(transactionId) {
-			this.$apollo.query({
-				query: gql` query {
-          getTransactionById(id: "${transactionId}") {
-            id,
-            account,
-            description,
-            category,
-            reference,
-            currency,
-            amount,
-            status,
-            transactionDate,
-            createdAt,
-            updatedAt
-          }
-        }`
-			}).then(response => {
-				const query = response.data;
-				this.transaction = query.getTransactionById;
-			});
-		}
-	},
-	data() {
-		return {
-			transactionParam: this.$route.params.transaction,
-			transaction: {}
-		};
-	},
-	mounted() {
-    console.log('this.transactionParam', this.transactionParam)
-		this.getTransactionById(this.transactionParam);
-	},
+  name: "TransactionDetails",
+
+  methods: {
+    getTransactionById(transactionId) {
+      this.$apollo
+        .query({
+          query: GET_TRANSACTION_BY_ID,
+          variables: {
+            transactionId,
+          },
+        })
+        .then(({ data }) => {
+          this.transaction = data.getTransactionById;
+        });
+    },
+  },
+
+  data() {
+    return {
+      transactionParam: this.$route.params.transaction,
+      transaction: {},
+    };
+  },
+
+  mounted() {
+    this.getTransactionById(this.transactionParam);
+  },
 };
 </script>
