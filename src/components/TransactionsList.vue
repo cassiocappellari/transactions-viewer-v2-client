@@ -33,16 +33,12 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Account</th>
+            <th>Transaction Date</th>
             <th>Description</th>
-            <th>Category</th>
-            <th>Reference</th>
             <th>Currency</th>
             <th>Amount</th>
-            <th>Status</th>
-            <th>Transaction Date</th>
-            <th>Created At</th>
-            <th>Updated At</th>
+            <th>Account</th>
+            <th>Category</th>
           </tr>
         </thead>
         <tbody>
@@ -52,16 +48,12 @@
             >
               <td>Details</td>
             </router-link>
-            <td>{{ transaction.account }}</td>
+            <td>{{ transaction.transactionDate }}</td>
             <td>{{ transaction.description }}</td>
-            <td>{{ transaction.category }}</td>
-            <td>{{ transaction.reference }}</td>
             <td>{{ transaction.currency }}</td>
             <td>{{ transaction.amount }}</td>
-            <td>{{ transaction.status }}</td>
-            <td>{{ transaction.transactionDate }}</td>
-            <td>{{ transaction.createdAt }}</td>
-            <td>{{ transaction.updatedAt }}</td>
+            <td>{{ transaction.account }}</td>
+            <td>{{ transaction.category }}</td>
           </tr>
         </tbody>
       </table>
@@ -81,6 +73,7 @@ export default {
   apollo: {
     transactions: {
       query: GET_TRANSACTIONS,
+      variables: () => ({ size: 30, skip: 0 }),
       update: (data) => data.getAllTransactions,
     },
   },
@@ -98,6 +91,25 @@ export default {
         .then(({ data }) => {
           this.transactions = data.getTransactionsByDateRange;
         });
+
+      this.isTransactionByRange = true;
+    },
+
+    fetchMore() {
+      const queryName = "getAllTransactions";
+
+      this.$apollo.queries.transactions.fetchMore({
+        variables: {
+          size: 30,
+          skip: this.transactions?.length + 1,
+        },
+        updateQuery: (previousResult, { fetchMoreResult }) => ({
+          [queryName]: [
+            ...previousResult[queryName],
+            ...fetchMoreResult[queryName],
+          ],
+        }),
+      });
     },
   },
 
@@ -105,7 +117,25 @@ export default {
     return {
       startMonth: "",
       endMonth: "",
+      isTransactionByRange: false,
     };
+  },
+
+  mounted() {
+    window.addEventListener("scroll", () => {
+      const {
+        scrollTop,
+        scrollHeight,
+        clientHeight,
+      } = document.documentElement;
+
+      if (
+        scrollTop + clientHeight >= scrollHeight &&
+        !this.isTransactionByRange
+      ) {
+        this.fetchMore();
+      }
+    });
   },
 };
 </script>

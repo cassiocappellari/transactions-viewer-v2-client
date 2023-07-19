@@ -1,8 +1,8 @@
 import { gql } from "graphql-tag";
 
 export const GET_TRANSACTIONS = gql`
-  query getAllTransactions {
-    getAllTransactions {
+  query getAllTransactions($size: Int, $skip: Int) {
+    getAllTransactions(size: $size, skip: $skip) {
       id
       account
       description
