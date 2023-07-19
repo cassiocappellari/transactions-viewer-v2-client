@@ -2,13 +2,32 @@
   <div>
     <div>
       <div id="filter-container">
-        <label>Start month:
-          <input type="datetime" v-mask="'####/##'" placeholder="YYYY/MM" v-model="startMonth" required>
+        <label
+          >Start month:
+          <input
+            type="datetime"
+            v-mask="'####/##'"
+            placeholder="YYYY/MM"
+            v-model="startMonth"
+            required
+          />
         </label>
-        <label id="filter-end-month">End month:
-          <input type="datetime" v-mask="'####/##'" placeholder="YYYY/MM" v-model="endMonth" required>
+        <label id="filter-end-month"
+          >End month:
+          <input
+            type="datetime"
+            v-mask="'####/##'"
+            placeholder="YYYY/MM"
+            v-model="endMonth"
+            required
+          />
         </label>
-        <button id="filter-button" @click="getTransactionsByDateRange(startMonth, endMonth)">Filter</button>
+        <button
+          id="filter-button"
+          @click="getTransactionsByDateRange(startMonth, endMonth)"
+        >
+          Filter
+        </button>
       </div>
       <table align="center" border="1">
         <thead>
@@ -28,7 +47,9 @@
         </thead>
         <tbody>
           <tr v-for="transaction of transactions" :key="transaction.id">
-            <router-link :to="{ name: 'details', params: { transaction:  transaction.id } }">
+            <router-link
+              :to="{ name: 'details', params: { transaction: transaction.id } }"
+            >
               <td>Details</td>
             </router-link>
             <td>{{ transaction.account }}</td>
@@ -49,51 +70,42 @@
 </template>
 
 <script>
-import gql from "graphql-tag";
-import {GET_TRANSACTIONS} from "../graphql/queries"
+import {
+  GET_TRANSACTIONS,
+  GET_TRANSACTIONS_BY_DATE_RANGE,
+} from "../graphql/queries";
 
 export default {
-	name: "TransactionsList",
+  name: "TransactionsList",
 
   apollo: {
     transactions: {
       query: GET_TRANSACTIONS,
-      update: (data) => data.getAllTransactions
-    }
+      update: (data) => data.getAllTransactions,
+    },
   },
 
-	methods: {
-		getTransactionsByDateRange(startMonth, endMonth) {
-			this.$apollo.query({
-				query: gql` query {
-          getTransactionsByDateRange(startMonth: "${startMonth}", endMonth: "${endMonth}") {
-            id,
-            account,
-            description,
-            category,
-            reference,
-            currency,
-            amount,
-            status,
-            transactionDate,
-            createdAt,
-            updatedAt
-          }
-        }`
-			}).then(response => {
-				const query = response.data;
-				this.transactions = query.getTransactionsByDateRange;
-			});
-		}
-	},
-	data() {
-		return {
-			startMonth: "",
-			endMonth: ""
-		};
-	},
-	mounted() {
-    console.log(this.transactions)
-	}
+  methods: {
+    getTransactionsByDateRange(startMonth, endMonth) {
+      this.$apollo
+        .query({
+          query: GET_TRANSACTIONS_BY_DATE_RANGE,
+          variables: {
+            startMonth,
+            endMonth,
+          },
+        })
+        .then(({ data }) => {
+          this.transactions = data.getTransactionsByDateRange;
+        });
+    },
+  },
+
+  data() {
+    return {
+      startMonth: "",
+      endMonth: "",
+    };
+  },
 };
 </script>
