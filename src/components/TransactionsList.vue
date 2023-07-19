@@ -48,7 +48,7 @@
             >
               <td>Details</td>
             </router-link>
-            <td>{{ transaction.transactionDate }}</td>
+            <td>{{ formatTransactionDate(transaction.transactionDate) }}</td>
             <td>{{ transaction.description }}</td>
             <td>{{ transaction.currency }}</td>
             <td>{{ transaction.amount }}</td>
@@ -66,6 +66,7 @@ import {
   GET_TRANSACTIONS,
   GET_TRANSACTIONS_BY_DATE_RANGE,
 } from "../graphql/queries";
+import { dateFormatter } from "../utils/dateFormatter";
 
 export default {
   name: "TransactionsList",
@@ -111,6 +112,29 @@ export default {
         }),
       });
     },
+
+    handleScrollEventListener() {
+      window.addEventListener("scroll", () => {
+        const {
+          scrollTop,
+          scrollHeight,
+          clientHeight,
+        } = document.documentElement;
+
+        if (
+          scrollTop + clientHeight >= scrollHeight &&
+          !this.isTransactionByRange
+        ) {
+          this.fetchMore();
+        }
+      });
+    },
+
+    formatTransactionDate(date) {
+      const formattedDate = dateFormatter(date);
+
+      return formattedDate;
+    },
   },
 
   data() {
@@ -122,20 +146,7 @@ export default {
   },
 
   mounted() {
-    window.addEventListener("scroll", () => {
-      const {
-        scrollTop,
-        scrollHeight,
-        clientHeight,
-      } = document.documentElement;
-
-      if (
-        scrollTop + clientHeight >= scrollHeight &&
-        !this.isTransactionByRange
-      ) {
-        this.fetchMore();
-      }
-    });
+    this.handleScrollEventListener();
   },
 };
 </script>

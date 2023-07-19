@@ -21,7 +21,7 @@
         </thead>
         <tbody>
           <tr>
-            <td>{{ transaction.transactionDate }}</td>
+            <td>{{ formatTransactionDate(transaction.transactionDate) }}</td>
             <td>{{ transaction.description }}</td>
             <td>{{ transaction.currency }}</td>
             <td>{{ transaction.amount }}</td>
@@ -40,6 +40,7 @@
 
 <script>
 import { GET_TRANSACTION_BY_ID } from "../graphql/queries";
+import { dateFormatter } from "../utils/dateFormatter";
 
 export default {
   name: "TransactionDetails",
@@ -56,6 +57,12 @@ export default {
         .then(({ data }) => {
           this.transaction = data.getTransactionById;
         });
+    },
+
+    formatTransactionDate(date) {
+      const formattedDate = dateFormatter(date);
+
+      return formattedDate;
     },
   },
 
