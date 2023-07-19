@@ -55,12 +55,12 @@ import {GET_TRANSACTIONS} from "../graphql/queries"
 export default {
 	name: "TransactionsList",
 
-  // apollo: {
-  //   transactions: {
-  //     query: GET_TRANSACTIONS,
-  //     update: (data) => data.getAllTransactions
-  //   }
-  // },
+  apollo: {
+    transactions: {
+      query: GET_TRANSACTIONS,
+      update: (data) => data.getAllTransactions
+    }
+  },
 
 	methods: {
 		getTransactionsByDateRange(startMonth, endMonth) {
